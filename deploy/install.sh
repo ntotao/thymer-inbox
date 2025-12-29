@@ -24,13 +24,17 @@ REPO_URL="https://github.com/$REPO_OWNER/thymer-inbox.git"
 
 echo -e "Installing to: ${GREEN}$INSTALL_DIR${NC}"
 
-if [ -d "$INSTALL_DIR" ]; then
-    echo "Directory exists, pulling latest changes..."
+if [ -d "$INSTALL_DIR" ] && [ -d "$INSTALL_DIR/.git" ]; then
+    echo "Updating existing installation..."
     cd "$INSTALL_DIR"
     git fetch origin
     git checkout "$BRANCH"
     git pull origin "$BRANCH"
 else
+    if [ -d "$INSTALL_DIR" ]; then
+        echo "Cleaning up previous incomplete installation..."
+        rm -rf "$INSTALL_DIR"
+    fi
     echo "Cloning repository..."
     git clone -b "$BRANCH" "$REPO_URL" "$INSTALL_DIR"
     cd "$INSTALL_DIR"
