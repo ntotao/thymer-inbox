@@ -9,10 +9,10 @@ NC='\033[0m' # No Color
 
 echo -e "${BLUE}=== Thymer Inbox Installer ===${NC}"
 
-# Check for Docker
-if ! command -v docker &> /dev/null; then
-    echo -e "${RED}Error: Docker is not installed.${NC}"
-    echo "Please install Docker and Docker Compose first."
+# Check for Git
+if ! command -v git &> /dev/null; then
+    echo -e "${RED}Error: git is not installed.${NC}"
+    echo "Please install git first."
     exit 1
 fi
 
@@ -20,20 +20,25 @@ fi
 INSTALL_DIR="$HOME/thymer-inbox"
 BRANCH="${1:-main}"
 REPO_OWNER="${2:-riclib}"
-REPO_URL="https://raw.githubusercontent.com/$REPO_OWNER/thymer-inbox/$BRANCH"
+REPO_URL="https://github.com/$REPO_OWNER/thymer-inbox.git"
 
 echo -e "Installing to: ${GREEN}$INSTALL_DIR${NC}"
-mkdir -p "$INSTALL_DIR"
-cd "$INSTALL_DIR"
 
-# Download files
-echo "Downloading configuration..."
-curl -f -sSL "$REPO_URL/docker-compose.yml" -o docker-compose.yml || { echo -e "${RED}Error: Failed to download docker-compose.yml${NC}"; exit 1; }
-curl -f -sSL "$REPO_URL/Caddyfile" -o Caddyfile || { echo -e "${RED}Error: Failed to download Caddyfile${NC}"; exit 1; }
+if [ -d "$INSTALL_DIR" ]; then
+    echo "Directory exists, pulling latest changes..."
+    cd "$INSTALL_DIR"
+    git fetch origin
+    git checkout "$BRANCH"
+    git pull origin "$BRANCH"
+else
+    echo "Cloning repository..."
+    git clone -b "$BRANCH" "$REPO_URL" "$INSTALL_DIR"
+    cd "$INSTALL_DIR"
+fi
 
 # Start services
 echo "Starting services..."
-docker-compose up -d
+docker-compose up -d --build
 
 # Find local IP
 IP=$(hostname -I | cut -d' ' -f1)
