@@ -28,8 +28,8 @@ cd "$INSTALL_DIR"
 
 # Download files
 echo "Downloading configuration..."
-curl -sSL "$REPO_URL/docker-compose.yml" -o docker-compose.yml
-curl -sSL "$REPO_URL/Caddyfile" -o Caddyfile
+curl -f -sSL "$REPO_URL/docker-compose.yml" -o docker-compose.yml || { echo -e "${RED}Error: Failed to download docker-compose.yml${NC}"; exit 1; }
+curl -f -sSL "$REPO_URL/Caddyfile" -o Caddyfile || { echo -e "${RED}Error: Failed to download Caddyfile${NC}"; exit 1; }
 
 # Start services
 echo "Starting services..."
