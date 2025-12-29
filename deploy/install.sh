@@ -18,7 +18,7 @@ fi
 
 # Set install directory
 INSTALL_DIR="$HOME/thymer-inbox"
-BRANCH="main"
+BRANCH="${1:-main}"
 REPO_URL="https://raw.githubusercontent.com/riclib/thymer-inbox/$BRANCH"
 
 echo -e "Installing to: ${GREEN}$INSTALL_DIR${NC}"
