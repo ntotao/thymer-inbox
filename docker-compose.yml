@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  thymer:
+    build: .
+    restart: unless-stopped
+    volumes:
+      - thymer-data:/root/.config/tm
+    environment:
+      - THYMER_URL=${THYMER_URL}
+      - THYMER_TOKEN=${THYMER_TOKEN}
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - thymer
+
+volumes:
+  thymer-data:
+  caddy_data:
+  caddy_config:

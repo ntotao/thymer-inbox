@@ -1,0 +1,10 @@
+{
+    # Self-signed certificate for local development
+    # Remove this block if you want to use a real domain with Let's Encrypt
+    local_certs
+}
+
+:443 {
+    reverse_proxy thymer:19501
+    tls internal
+}

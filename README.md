@@ -409,7 +409,60 @@ This makes it easy to integrate any source—the plugin doesn't care where conte
 
 ## Running as a Service
 
-For always-on availability:
+
+### Docker (Recommended)
+
+The easiest way to self-host is using Docker. This provides a secure HTTPS connection and a Web GUI for configuration.
+
+**One-line Installer**:
+```bash
+curl -sSL https://raw.githubusercontent.com/riclib/thymer-inbox/main/deploy/install.sh | bash
+```
+
+This will:
+1.  Set up the service in `~/thymer-inbox`
+2.  Start the server
+3.  Print your local IP address
+
+**Manual Setup**:
+```bash
+git clone https://github.com/riclib/thymer-inbox
+cd thymer-inbox
+docker-compose up -d
+```
+
+#### Configuration & First Run
+
+1.  **Open the Web GUI**:
+    Navigate to `https://<YOUR-SERVER-IP>` (or `https://localhost`).
+
+    > [!IMPORTANT]
+    > **Accept the Certificate**: You will see a "Not Secure" warning because of the self-signed certificate. You **MUST** manually accept this (click "Advanced" -> "Proceed") for the plugin to work.
+
+2.  **Bootstrap**:
+    - The first time you visit, the GUI is unlocked.
+    - Enter your **Thymer Token** and other credentials.
+    - Click **Save Configuration**.
+
+3.  **Security**:
+    - Once the token is saved, the GUI becomes **Locked**.
+    - To make changes later, you'll need to enter your Thymer Token.
+
+4.  **Connect Plugin**:
+    - In Thymer, set the plugin URL to `https://<YOUR-SERVER-IP>`.
+
+#### Updates
+
+To update to the latest version:
+```bash
+curl -sSL https://raw.githubusercontent.com/riclib/thymer-inbox/main/deploy/update.sh | bash
+```
+
+### Manual Systemd Service
+
+### Manual Systemd Service
+
+For always-on availability without Docker:
 
 ```bash
 # Install systemd user service
