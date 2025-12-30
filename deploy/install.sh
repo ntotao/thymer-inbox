@@ -31,6 +31,15 @@ if [ -d "$INSTALL_DIR" ] && [ -d "$INSTALL_DIR/.git" ]; then
     git checkout "$BRANCH"
     git pull origin "$BRANCH"
 else
+    if [ -d "$INSTALL_DIR" ]; then
+        echo "Cleaning up previous incomplete installation..."
+        rm -rf "$INSTALL_DIR"
+    fi
+    echo "Cloning repository..."
+    git clone -b "$BRANCH" "$REPO_URL" "$INSTALL_DIR"
+    cd "$INSTALL_DIR"
+fi
+
 # Configure ports if set
 if [ ! -z "$HTTPS_PORT" ]; then
     echo "Configuring custom ports..."
