@@ -40,17 +40,29 @@ else
     cd "$INSTALL_DIR"
 fi
 
+# Configure ports if set
+if [ ! -z "$HTTP_PORT" ] || [ ! -z "$HTTPS_PORT" ]; then
+    echo "Configuring custom ports..."
+    echo "HTTP_PORT=${HTTP_PORT:-80}" > .env
+    echo "HTTPS_PORT=${HTTPS_PORT:-443}" >> .env
+fi
+
 # Start services
 echo "Starting services..."
 docker-compose up -d --build
 
 # Find local IP
 IP=$(hostname -I | cut -d' ' -f1)
+PORT="${HTTPS_PORT:-443}"
+URL="https://$IP"
+if [ "$PORT" != "443" ]; then
+    URL="https://$IP:$PORT"
+fi
 
 echo -e "\n${GREEN}=== Installation Complete! ===${NC}"
-echo -e "Server is running at: ${BLUE}https://$IP${NC}"
+echo -e "Server is running at: ${BLUE}$URL${NC}"
 echo -e "\n${RED}IMPORTANT:${NC}"
-echo "1. Open https://$IP in your browser"
+echo "1. Open $URL in your browser"
 echo "2. Accept the self-signed certificate warning"
 echo "3. Configure your tokens in the Web GUI"
-echo "4. Use https://$IP as the plugin URL in Thymer"
+echo "4. Use $URL as the plugin URL in Thymer"
