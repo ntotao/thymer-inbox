@@ -1,12 +1,8 @@
 {
     debug
-    on_demand_tls
 }
 
-:443 {
+localhost:443 {
+    tls internal
     reverse_proxy thymer:19501
-    tls {
-        issuer internal
-        on_demand
-    }
 }

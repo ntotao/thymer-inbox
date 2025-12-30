@@ -47,6 +47,27 @@ if [ ! -z "$HTTP_PORT" ] || [ ! -z "$HTTPS_PORT" ]; then
     echo "HTTPS_PORT=${HTTPS_PORT:-443}" >> .env
 fi
 
+# Generate dynamic Caddyfile
+echo "Generating Caddy configuration..."
+IP_ADDRESS="${IP:-$(hostname -I | cut -d' ' -f1)}"
+CADDY_PORT="${HTTPS_PORT:-443}"
+CADDY_HOST="$IP_ADDRESS"
+
+if [ "$CADDY_PORT" != "443" ]; then
+    CADDY_HOST="$IP_ADDRESS:$CADDY_PORT"
+fi
+
+cat <<EOF > Caddyfile
+{
+    debug
+}
+
+$CADDY_HOST {
+    tls internal
+    reverse_proxy thymer:19501
+}
+EOF
+
 # Start services
 echo "Starting services..."
 docker-compose up -d --build
