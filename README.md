@@ -431,6 +431,16 @@ cd thymer-inbox
 docker-compose up -d
 ```
 
+#### Custom Ports
+
+If ports 80/443 are busy (e.g., you run Nextcloud), you can use custom ports:
+
+```bash
+export HTTP_PORT=9080
+export HTTPS_PORT=9443
+curl -sSL https://raw.githubusercontent.com/riclib/thymer-inbox/main/deploy/install.sh | bash
+```
+
 #### Configuration & First Run
 
 1.  **Open the Web GUI**:
