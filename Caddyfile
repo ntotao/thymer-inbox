@@ -1,4 +1,14 @@
+{
+    on_demand_tls {
+        interval 2m
+        burst    5
+    }
+}
+
 :443 {
     reverse_proxy thymer:19501
-    tls internal
+    tls {
+        issuer internal
+        on_demand
+    }
 }
