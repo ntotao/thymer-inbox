@@ -31,42 +31,11 @@ if [ -d "$INSTALL_DIR" ] && [ -d "$INSTALL_DIR/.git" ]; then
     git checkout "$BRANCH"
     git pull origin "$BRANCH"
 else
-    if [ -d "$INSTALL_DIR" ]; then
-        echo "Cleaning up previous incomplete installation..."
-        rm -rf "$INSTALL_DIR"
-    fi
-    echo "Cloning repository..."
-    git clone -b "$BRANCH" "$REPO_URL" "$INSTALL_DIR"
-    cd "$INSTALL_DIR"
-fi
-
 # Configure ports if set
-if [ ! -z "$HTTP_PORT" ] || [ ! -z "$HTTPS_PORT" ]; then
+if [ ! -z "$HTTPS_PORT" ]; then
     echo "Configuring custom ports..."
-    echo "HTTP_PORT=${HTTP_PORT:-80}" > .env
-    echo "HTTPS_PORT=${HTTPS_PORT:-443}" >> .env
+    echo "HTTPS_PORT=${HTTPS_PORT:-19501}" > .env
 fi
-
-# Generate dynamic Caddyfile
-echo "Generating Caddy configuration..."
-IP_ADDRESS="${IP:-$(hostname -I | cut -d' ' -f1)}"
-CADDY_PORT="${HTTPS_PORT:-443}"
-CADDY_HOST="$IP_ADDRESS"
-
-if [ "$CADDY_PORT" != "443" ]; then
-    CADDY_HOST="$IP_ADDRESS:$CADDY_PORT"
-fi
-
-cat <<EOF > Caddyfile
-{
-    debug
-}
-
-$CADDY_HOST {
-    tls internal
-    reverse_proxy thymer:19501
-}
-EOF
 
 # Start services
 echo "Starting services..."
@@ -74,11 +43,8 @@ docker-compose up -d --build
 
 # Find local IP
 IP=$(hostname -I | cut -d' ' -f1)
-PORT="${HTTPS_PORT:-443}"
-URL="https://$IP"
-if [ "$PORT" != "443" ]; then
-    URL="https://$IP:$PORT"
-fi
+PORT="${HTTPS_PORT:-19501}"
+URL="https://$IP:$PORT"
 
 echo -e "\n${GREEN}=== Installation Complete! ===${NC}"
 echo -e "Server is running at: ${BLUE}$URL${NC}"

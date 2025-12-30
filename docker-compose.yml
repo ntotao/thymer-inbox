@@ -10,20 +10,8 @@ services:
       - THYMER_URL=${THYMER_URL}
       - THYMER_TOKEN=${THYMER_TOKEN}
 
-  caddy:
-    image: caddy:2-alpine
-    restart: unless-stopped
     ports:
-      - "${HTTP_PORT:-80}:80"
-      - "${HTTPS_PORT:-443}:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on:
-      - thymer
+      - "${HTTPS_PORT:-19501}:19501"
 
 volumes:
   thymer-data:
-  caddy_data:
-  caddy_config:

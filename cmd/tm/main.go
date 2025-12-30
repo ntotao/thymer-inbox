@@ -1,14 +1,16 @@
 // tm - Thymer queue CLI
 //
 // Usage:
-//   cat README.md | tm              Push markdown to queue (action: append)
-//   echo "Meeting notes" | tm       Push to queue
-//   tm lifelog Had coffee           Push lifelog entry
-//   tm --collection "Tasks" < x.md  Push with collection target
-//   tm serve                        Run local server (same API as Cloudflare Worker)
+//
+//	cat README.md | tm              Push markdown to queue (action: append)
+//	echo "Meeting notes" | tm       Push to queue
+//	tm lifelog Had coffee           Push lifelog entry
+//	tm --collection "Tasks" < x.md  Push with collection target
+//	tm serve                        Run local server (same API as Cloudflare Worker)
 //
 // Config: Set THYMER_URL and THYMER_TOKEN environment variables
-//         or create ~/.config/tm/config with url= and token= lines
+//
+//	or create ~/.config/tm/config with url= and token= lines
 package main
 
 import (
@@ -35,7 +37,6 @@ const (
 	LocalServerPort = "19501"
 	LocalServerURL  = "http://localhost:19501"
 )
-
 
 type QueueItem struct {
 	ID         string `json:"id"`
@@ -254,12 +255,12 @@ func sendToQueue(config Config, req QueueItem) error {
 // ============================================================================
 
 type Server struct {
-	queue      map[string]QueueItem
-	mu         sync.RWMutex
-	token      string
-	ghSyncer   *GitHubSyncer
-	rwSyncer   *ReadwiseSyncer
-	calSyncer  *CalendarSyncer
+	queue     map[string]QueueItem
+	mu        sync.RWMutex
+	token     string
+	ghSyncer  *GitHubSyncer
+	rwSyncer  *ReadwiseSyncer
+	calSyncer *CalendarSyncer
 }
 
 func resyncRepo(repo string) {
@@ -608,9 +609,25 @@ func runServer() {
 
 	srv.registerGUIRoutes(mux)
 
-	logger.Info("server starting", "port", LocalServerPort, "token", token)
+	// Certificate paths
+	home, _ := os.UserHomeDir()
+	certDir := filepath.Join(home, ".config", "tm", "certs")
+	certPath := filepath.Join(certDir, "cert.pem")
+	keyPath := filepath.Join(certDir, "key.pem")
 
-	if err := http.ListenAndServe(":"+LocalServerPort, srv.corsMiddleware(mux)); err != nil {
+	// Generate certs if they don't exist
+	if _, err := os.Stat(certPath); os.IsNotExist(err) {
+		logger.Info("generating self-signed certificate", "path", certPath)
+		if err := generateSelfSignedCert(certPath, keyPath); err != nil {
+			logger.Error("failed to generate certificate", "error", err)
+			os.Exit(1)
+		}
+	}
+
+	logger.Info("server starting (HTTPS)", "port", LocalServerPort, "token", token)
+
+	// Use ListenAndServeTLS
+	if err := http.ListenAndServeTLS(":"+LocalServerPort, certPath, keyPath, srv.corsMiddleware(mux)); err != nil {
 		logger.Error("server failed", "error", err)
 		os.Exit(1)
 	}
@@ -974,7 +991,6 @@ func (s *Server) popOldest() *QueueItem {
 // ============================================================================
 // Config
 // ============================================================================
-
 
 func printUsage() {
 	fmt.Println("tm - Thymer queue CLI")
