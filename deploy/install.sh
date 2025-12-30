@@ -29,7 +29,7 @@ if [ -d "$INSTALL_DIR" ] && [ -d "$INSTALL_DIR/.git" ]; then
     cd "$INSTALL_DIR"
     git fetch origin
     git checkout "$BRANCH"
-    git pull origin "$BRANCH"
+    git reset --hard "origin/$BRANCH"
 else
     if [ -d "$INSTALL_DIR" ]; then
         echo "Cleaning up previous incomplete installation..."
