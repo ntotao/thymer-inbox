@@ -1,9 +1,6 @@
 {
     debug
-    on_demand_tls {
-        interval 2m
-        burst    5
-    }
+    on_demand_tls
 }
 
 :443 {
